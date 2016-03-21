@@ -302,7 +302,7 @@ COMMAND tail -c -7 COMMAND tr -d "\\n" OUTPUT_VARIABLE GitBranch )
 set( GitCommand2 "log --pretty=format:\\\"%h\\\" -1" )
 execute_process( COMMAND git log --pretty=format:%h WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 COMMAND head -n 1  COMMAND tr -d "\\n" OUTPUT_VARIABLE GitHashtag )
-set( ANCESTREE_VERSION \"${GitBranch}-${GitHashtag}\" )
+set( SPRUCE_VERSION \"${GitBranch}-${GitHashtag}\" )
 
 configure_file( src/config.h.in ${PROJECT_SOURCE_DIR}/src/config.h )
 

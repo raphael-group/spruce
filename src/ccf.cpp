@@ -56,7 +56,7 @@ int main(int argc, char** argv)
 
   if (ap.given("-version"))
   {
-    std::cout << "Version number: " << ANCESTREE_VERSION << std::endl;
+    std::cout << "Version number: " << SPRUCE_VERSION << std::endl;
     return 0;
   }
   
