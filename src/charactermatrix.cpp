@@ -86,9 +86,12 @@ void CharacterMatrix::applyHeuristic()
         {
           if (p == 0)
           {
-            std::cerr << "Removing character " <<  _M[0][c].characterLabel() << " (" << c << ") : ";
-            StateGraph::print(it->first, std::cerr);
-            std::cerr << std::endl;
+            if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
+            {
+              std::cerr << "Removing character " <<  _M[0][c].characterLabel() << " (" << c << ") : ";
+              StateGraph::print(it->first, std::cerr);
+              std::cerr << std::endl;
+            }
           }
         }
       }
@@ -454,10 +457,18 @@ void CharacterMatrix::init()
   {
     for (int c = 0; c < _n; ++c)
     {
-      std::cerr << "Generating compatible state trees for character " << _M[p][c].characterLabel() << " (" << c
-                << ") in sample " << _M[p][c].sampleLabel() << " (" << p << ")..." << std::flush;
+      if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
+      {
+        std::cerr << "Generating compatible state trees for character " << _M[p][c].characterLabel() << " (" << c
+                  << ") in sample " << _M[p][c].sampleLabel() << " (" << p << ")..." << std::flush;
+      }
+
       _M[p][c].solve(_maxX[c], _maxXY, includeMutationEdge[c], _F[p][c]);
-      std::cerr << " Done: " << _F[p][c].size() << " state trees" << std::endl;
+      
+      if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
+      {
+        std::cerr << " Done: " << _F[p][c].size() << " state trees" << std::endl;
+      }
     }
   }
   
@@ -550,9 +561,12 @@ void CharacterMatrix::init()
     }
   }
   
-  for (int c = 0; c < _n; ++c)
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
-    std::cerr << "Number of state trees for character " << _M[0][c].characterLabel() << " (" << c << ") : " << numStateTrees(c) << std::endl;
+    for (int c = 0; c < _n; ++c)
+    {
+      std::cerr << "Number of state trees for character " << _M[0][c].characterLabel() << " (" << c << ") : " << numStateTrees(c) << std::endl;
+    }
   }
   
   const int kk = k();

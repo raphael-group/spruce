@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.8 )
 
-project( GabowMyers )
+project( SPRUCE )
 
 set( merge_src
   src/merge.cpp
@@ -224,6 +224,54 @@ set( compatiblestatetrees_hdr
   src/solutionset.h
 )
 
+set( cliques_src
+  src/cliques.cpp
+  src/compatibilitygraph.cpp
+  src/bronkerbosch.cpp
+  src/stategraph.cpp
+  src/character.cpp
+  src/charactermatrix.cpp
+  src/utils.cpp
+  src/matrix.cpp
+  src/realmatrix.cpp
+  src/tensor.cpp
+  src/realtensor.cpp
+  src/rootedcladisticancestrygraph.cpp
+  src/rootedcladisticnoisyancestrygraph.cpp
+  src/perfectphylomatrix.cpp
+  src/perfectphylotree.cpp
+  src/perfectphylograph.cpp
+  src/statetree.cpp
+  src/rootedcladisticenumeration.cpp
+  src/rootedcladisticnoisyenumeration.cpp
+  src/solution.cpp
+  src/solutionset.cpp
+)
+
+set( cliques_hdr
+  src/config.h
+  src/compatibilitygraph.h
+  src/bronkerbosch.h
+  src/stategraph.h
+  src/character.h
+  src/charactermatrix.h
+  src/utils.h
+  src/matrix.h
+  src/realmatrix.h
+  src/tensor.h
+  src/realtensor.h
+  src/rootedcladisticancestrygraph.h
+  src/rootedcladisticnoisyancestrygraph.h
+  src/perfectphylomatrix.h
+  src/perfectphylotree.h
+  src/perfectphylograph.h
+  src/statetree.h
+  src/rootedcladisticenumeration.h
+  src/rootedcladisticnoisyenumeration.h
+  src/solution.h
+  src/solutionset.h
+)
+
 set( randomtree_src
   src/randomtree.cpp
   src/utils.cpp
@@ -314,6 +362,10 @@ find_package( Boost REQUIRED COMPONENTS thread system filesystem )
 include_directories( "${LIBLEMON_ROOT}/include" "src" ${Boost_INCLUDE_DIRS} )
 link_directories( "${LIBLEMON_ROOT}/lib" )
 
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: Debug Release Profile" FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 set( CommonLibs
   m
   emon
@@ -334,6 +386,9 @@ target_link_libraries( enumerate ${CommonLibs} )
 
 add_executable( compatiblestatetrees EXCLUDE_FROM_ALL ${compatiblestatetrees_src} ${compatiblestatetrees_hdr} )
 target_link_libraries( compatiblestatetrees ${CommonLibs} )
+
+add_executable( cliques ${cliques_src} ${cliques_hdr} )
+target_link_libraries( cliques ${CommonLibs} )
 
 add_executable( merge ${merge_src} ${merge_hdr} )
 target_link_libraries( merge ${CommonLibs} )

@@ -64,6 +64,7 @@ typedef std::vector<StlRealIntervalVector> StlRealIntervalMatrix;
 typedef std::vector<StlRealIntervalMatrix> StlRealIntervalTensor;
   
 typedef std::pair<int, int> IntPair;
+typedef std::set<IntPair> IntPairSet;
   
 bool intPairCompare(const IntPair& a, const IntPair& b);
   
@@ -89,29 +90,6 @@ StlBoolMatrix discretize(const StlDoubleMatrix& M);
 std::istream& getline(std::istream& is, std::string& t);
   
 extern lemon::Tolerance<double> g_tol;
-  
-template<class CNA_MATRIX>
-inline void force_state_0(CNA_MATRIX& M)
-{
-  // force state 0
-  int n = M.front().size();
-  int m = M.size();
-  for (int c = 0; c < n; ++c)
-  {
-    bool force = true;
-    for (int p = 0; p < m; ++p)
-    {
-      force &= !g_tol.nonZero(M[p][c].cnaProportion());
-    }
-    if (force)
-    {
-      for (int p = 0; p < m; ++p)
-      {
-        M[p][c].forceStateZero();
-      }
-    }
-  }
-}
 
 } // namespace gm
 

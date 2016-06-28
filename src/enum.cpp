@@ -91,7 +91,6 @@ void enumerate(int limit,
                bool writeCliqueFile,
                bool readCliqueFile,
                const std::string& cliqueFile,
-               bool shuffle,
                int offset,
                const IntSet& whiteList,
                SolutionSet& sols)
@@ -119,7 +118,10 @@ void enumerate(int limit,
     return;
   }
   
-  std::cerr << "Intializing copy-state matrix ..." << std::endl;
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << "Intializing copy-state matrix ..." << std::endl;
+  }
   M.init();
   
   if (monoclonal)
@@ -130,13 +132,18 @@ void enumerate(int limit,
   CompatibilityGraph* pComp = NULL;
   if (!readCliqueFile)
   {
-    std::cerr << "Initializing compatibility graph ..." << std::endl;
-    pComp = new CompatibilityGraph(M, shuffle);
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Initializing compatibility graph ..." << std::endl;
+    }
+    pComp = new CompatibilityGraph(M);
+    pComp->init(IntPairSet(), -1);
   }
   else
   {
     std::ifstream inFile(cliqueFile);
-    pComp = new CompatibilityGraph(M, shuffle, inFile);
+    pComp = new CompatibilityGraph(M);
+    pComp->init(inFile);
   }
   
   if (writeCliqueFile)
@@ -155,7 +162,10 @@ void enumerate(int limit,
   sols = alg.sols();
   delete pComp;
   
-  std::cerr << "Generated " << sols.solutionCount() << " solutions" << std::endl;
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << "Generated " << sols.solutionCount() << " solutions" << std::endl;
+  }
   inFile.close();
 }
 
@@ -183,14 +193,13 @@ int main(int argc, char** argv)
     .refOption("m", "Monoclonal", monoclonal)
     .refOption("purity", "Purity values (used for fixing trunk)",  purityString)
     .refOption("clique", "Clique file", cliqueFile)
-    .refOption("d", "Deterministic enumeration of state tree combinations", deterministic)
     .refOption("t", "Number of threads (default: 2)", threads)
     .refOption("l", "Maximum number of trees to enumerate (default: -1)", limit)
     .refOption("ll", "Time limit in seconds (default: -1)", timeLimit)
     .refOption("s", "State tree combination limit (default: -1)", state_tree_limit)
     .refOption("o", "State tree combination offset (default: 0)", offset)
     .refOption("r", "Seed", random_seed)
-    .refOption("lb", "Lowerbound (default: 0)", lowerbound)
+    .refOption("lb", "Lower bound on #characters in enumerated tree (default: 0)", lowerbound)
     .refOption("w", "Characters that must be present in the solution trees", whiteListString)
     .other("input_1", "Input file")
     .other("input_2", "Interval file relating SNVs affected by the same CNA");
@@ -251,7 +260,6 @@ int main(int argc, char** argv)
             writeCliqueFile,
             readCliqueFile,
             cliqueFile,
-            !deterministic,
             offset,
             whiteList,
             sols);

@@ -325,7 +325,10 @@ void RootedCladisticEnumeration::run()
     _threadGroup.join_all();
   }
 
-  std::cerr << "\r" << std::flush;
+  if (_verbose)
+  {
+    std::cerr << "\r" << std::flush;
+  }
 }
   
 bool RootedCladisticEnumeration::finalize(SubDigraph& T)

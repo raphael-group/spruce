@@ -30,8 +30,15 @@ void Character::remove(const IntPairSet& L0)
 {
   for (StateGraph::IntPairSetIt it = L0.begin(); it != L0.end(); ++it)
   {
-    std::cerr << "Removing (" << it->first << "," << it->second << ") from character " << _characterLabel
-              << " (" << _characterIndex << ") in sample " << _sampleLabel << " (" << _sampleIndex << "), mu = 0 across all samples" << std::endl;
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Removing copy-number state (" << it->first << "," << it->second
+                << ") from character " << _characterLabel
+                << " (" << _characterIndex
+                << ") in sample " << _sampleLabel
+                << " (" << _sampleIndex << "), mu = 0 across all samples"
+                << std::endl;
+    }
     
     assert(_M[it->first][it->second] == 0);
     for (CopyStateListNonConstIt it2 = _L.begin(); it2 != _L.end();)

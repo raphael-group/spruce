@@ -12,6 +12,8 @@
 #include "charactermatrix.h"
 #include "bronkerbosch.h"
 #include "solutionset.h"
+#include <map>
+#include <set>
 
 namespace gm {
   
@@ -20,12 +22,9 @@ class CompatibilityGraph
 public:
   typedef std::vector<StateTree> StateTreeVector;
   
-  CompatibilityGraph(const CharacterMatrix& M,
-                     bool shuffle);
+  typedef std::map<int, int> IntIntMap;
   
-  CompatibilityGraph(const CharacterMatrix& M,
-                     bool shuffle,
-                     std::istream& inFile);
+  CompatibilityGraph(const CharacterMatrix& M);
   
   void write(std::ostream& out) const;
   
@@ -44,18 +43,25 @@ public:
             StlIntVector& mapNewCharToOldChar,
             StlIntVector& mapOldCharToNewChar) const;
   
+  void init(const IntPairSet& filter, int size);
+  
+  void init(std::ifstream& inFile);
+  
 protected:
   GRAPH_TYPEDEFS(Graph);
   typedef Graph::NodeMap<IntPair> IntPairNodeMap;
   
   typedef std::vector<Node> NodeVector;
+  typedef std::set<Node> NodeSet;
   typedef NodeVector::const_iterator NodeVectorIt;
   typedef std::vector<NodeVector> NodeMatrix;
+  typedef NodeMatrix::const_iterator NodeMatrixIt;
   
-  void init(bool initEdges);
-  void solve();
+  void initVertices();
+  void initEdges();
   
   bool isCompatible(const IntPair& cs, const IntPair& dt) const;
+  void applyFilter(const IntPairSet& filter, const NodeMatrix& cliques);
   
 private:
   const CharacterMatrix& _M;
@@ -63,7 +69,7 @@ private:
   IntPairNodeMap _nodeToCharStateTree;
   NodeMatrix _charStateTreeToNode;
   
-  NodeMatrix _maximumCliques;
+  NodeMatrix _cliques;
   unsigned long _combinations;
   StlIntVector _mapping;
 };

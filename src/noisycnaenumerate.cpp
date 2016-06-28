@@ -51,13 +51,16 @@ void NoisyCnaEnumerate::enumerate(int limit,
   pi[0] = offset;
   int count = 0;
   do {
-    if (state_tree_limit != -1)
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
     {
-      std::cerr << "State tree combination " << ++count << "/" << state_tree_limit << "..." << std::endl;
-    }
-    else
-    {
-      std::cerr << "State tree combination " << ++count << "/" << _combinations << "..." << std::endl;
+      if (state_tree_limit != -1)
+      {
+        std::cerr << "State tree combination " << ++count << "/" << state_tree_limit << "..." << std::endl;
+      }
+      else
+      {
+        std::cerr << "State tree combination " << ++count << "/" << _combinations << "..." << std::endl;
+      }
     }
     solve(pi, limit, timeLimit, threads, state_tree_limit, monoclonal, whiteList);
   } while (next(state_tree_limit, offset, pi));
@@ -157,12 +160,20 @@ void NoisyCnaEnumerate::fixTrunk(const RealTensor& F_ub,
   
   typedef std::set<IntPair> IntPairSet;
   
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << "Truncal characters (CCF_lb >= 1, across all samples):" << std::endl;
+  }
+  
   IntPairSet truncalCharacters;
   for (int c = 0; c < n; ++c)
   {
-    std::cerr << "Character " << _M(0, mapNewCharToOldChar[c]).characterLabel() << " (" << mapNewCharToOldChar[c] << ") : ";
-    S[c].writeEdgeList(std::cerr);
-    std::cerr << std::endl;
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Character " << _M(0, mapNewCharToOldChar[c]).characterLabel() << " (" << mapNewCharToOldChar[c] << ") : ";
+      S[c].writeEdgeList(std::cerr);
+      std::cerr << std::endl;
+    }
     
     bool truncal = true;
     int mutation_i = -1;
@@ -207,12 +218,15 @@ void NoisyCnaEnumerate::fixTrunk(const RealTensor& F_ub,
     }
   }
   
-  std::cerr << "Truncal:" << std::endl;
-  for (auto ci : truncalCharacters)
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
-    auto xyz = _M.stateToTriple(ci.second);
-    std::cerr << _M(0, mapNewCharToOldChar[ci.first]).characterLabel()
-              << " , (" << xyz._x << "," << xyz._y << "," << xyz._z << ")" << std::endl;
+    std::cerr << "Truncal character-state pairs:" << std::endl;
+    for (auto ci : truncalCharacters)
+    {
+      auto xyz = _M.stateToTriple(ci.second);
+      std::cerr << _M(0, mapNewCharToOldChar[ci.first]).characterLabel()
+                << " , (" << xyz._x << "," << xyz._y << "," << xyz._z << ")" << std::endl;
+    }
   }
   
   Digraph::Node monoClonalRoot = G.collapse(truncalCharacters);
@@ -276,7 +290,10 @@ void NoisyCnaEnumerate::solve(const StlIntVector& pi,
     enumerate.populateSolutionSet(_sols);
   }
   
-  std::cerr << std::endl << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize << std::endl;
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << std::endl << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize << std::endl;
+  }
 }
   
 void NoisyCnaEnumerate::get(int state_tree_limit,

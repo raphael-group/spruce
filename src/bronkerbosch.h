@@ -12,6 +12,7 @@
 #include <vector>
 #include <list>
 #include <limits>
+#include <set>
 #include <boost/dynamic_bitset.hpp>
 #include "utils.h"
 
@@ -30,6 +31,7 @@ public:
   } SolverType;
 
   typedef std::vector<Node> NodeVector;
+  typedef std::map<int, int> IntIntMap;
   
 protected:
   typedef Graph::NodeMap<size_t> BitNodeMap;
@@ -37,6 +39,10 @@ protected:
   typedef Graph::NodeMap<BitSet> BitSetNodeMap;
   typedef std::list<Node> NodeList;
   typedef std::vector<NodeList> NodeListVector;
+  typedef std::vector<NodeVector> NodeVectorVector;
+  typedef NodeVectorVector::const_iterator NodeVectorVectorIt;
+  typedef std::map<int, NodeVectorVectorIt> CliqueItMap;
+  typedef std::set<int> IntSet;
   
   struct CliqueComp
   {
@@ -67,11 +73,52 @@ public:
     }
   }
   
-  void getCliques(const size_t count,
-                  std::vector<NodeVector>& cliqueVector) const
+  const IntIntMap& getNrCliquesBySize() const
   {
-    assert(0 <= count && count <= _cliques.size());
-    cliqueVector.insert(cliqueVector.end(), _cliques.begin(), _cliques.begin() + count);
+    return _nrCliquesBySize;
+  }
+  
+  int getNrCliquesBySize(int size) const
+  {
+    if (_nrCliquesBySize.count(size) == 0)
+    {
+      return 0;
+    }
+    else
+    {
+      return _nrCliquesBySize.find(size)->second;
+    }
+  }
+  
+  void getCliquesBySize(int size,
+                        std::vector<NodeVector>& cliqueVector) const
+  {
+    int count = getNrCliquesBySize(size);
+    if (count == 0)
+      return;
+    
+    assert(_firstCliqueBySize.find(size) != _firstCliqueBySize.end());
+    NodeVectorVectorIt firstIt = _firstCliqueBySize.find(size)->second;
+    
+    cliqueVector.insert(cliqueVector.end(), firstIt, firstIt + count);
+  }
+  
+  IntSet getCliqueSizes() const
+  {
+    IntSet res;
+    
+    for (const auto& kv : _nrCliquesBySize)
+    {
+      res.insert(kv.first);
+    }
+    
+    return res;
+  }
+  
+  void getMaximumCliques(std::vector<NodeVector>& cliqueVector) const
+  {
+    int size = _cliques[0].size();
+    getCliquesBySize(size, cliqueVector);
   }
   
   size_t getNumberOfMaximumCliques() const
@@ -87,20 +134,49 @@ public:
     return _cliques.size();
   }
 
-  const std::vector<NodeVector>& getMaxCliques() const { return _cliques; }
+  const NodeVectorVector& getCliques() const { return _cliques; }
   
   void sortBySize()
   {
     std::sort(_cliques.begin(), _cliques.end(), CliqueComp());
+    
+    if (_cliques.empty())
+      return;
+    
+    _nrCliquesBySize.clear();
+    for (size_t i = 0; i < _cliques.size(); ++i)
+    {
+      int s = _cliques[i].size();
+      if (_nrCliquesBySize.count(s) == 0)
+        _nrCliquesBySize[s] = 0;
+      
+      ++_nrCliquesBySize[s];
+    }
+    
+    _firstCliqueBySize.clear();
+    for (size_t i = 0; i < _cliques.size(); ++i)
+    {
+      int s = _cliques[i].size();
+      if (i == 0)
+      {
+        _firstCliqueBySize[s] = _cliques.begin() + i;
+      }
+      else if (_cliques[i-1].size() != s)
+      {
+        _firstCliqueBySize[s] = _cliques.begin() + i;
+      }
+    }
   }
 
 protected:
   const Graph& _g;
   const size_t _n;
-  std::vector<NodeVector> _cliques;
-  std::vector<Node> _bitToNode;
+  NodeVectorVector _cliques;
+  NodeVector _bitToNode;
   BitNodeMap _nodeToBit;
   BitSetNodeMap _bitNeighborhood;
+  IntIntMap _nrCliquesBySize;
+  CliqueItMap _firstCliqueBySize;
 
   size_t computeDegeneracy(NodeList& order);
 

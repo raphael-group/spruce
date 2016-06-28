@@ -36,7 +36,10 @@ void CnaEnumerate::init()
     int s = _M.numStateTrees(c);
     if (s == 0)
     {
-      std::cerr << "Tossing out character " << _M(0, c).characterLabel() << " (" << _M(0, c).characterIndex() << "), no compatible state trees across all samples" << std::endl;
+      if (g_verbosity >= VERBOSE_ESSENTIAL)
+      {
+        std::cerr << "Tossing out character " << _M(0, c).characterLabel() << " (" << _M(0, c).characterIndex() << "), no compatible state trees across all samples" << std::endl;
+      }
       --_real_n;
     }
     else
@@ -60,7 +63,10 @@ void CnaEnumerate::enumerate(int limit,
   StlIntVector pi(n, 0);
   int count = 0;
   do {
-    std::cerr << "State tree combination " << ++count << "/" << _combinations << "..." << std::endl;
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "State tree combination " << ++count << "/" << _combinations << "..." << std::endl;
+    }
     solve(pi, limit, timeLimit, threads, monoclonal, whiteList);
 //    for (int c = 0; c < n; ++c)
 //    {
@@ -174,7 +180,10 @@ void CnaEnumerate::solve(const StlIntVector& pi,
                                        whiteList);
   enumerate.run();
   
-  std::cerr << std::endl << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize << std::endl;
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << std::endl << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize << std::endl;
+  }
   
   if (enumerate.objectiveValue() >= _treeSize)
   {

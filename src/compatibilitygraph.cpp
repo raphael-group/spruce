@@ -15,7 +15,7 @@
 
 namespace gm {
   
-CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M, bool shuffle)
+CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M)
   : _M(M)
   , _G()
   , _nodeToCharStateTree(_G)
@@ -23,45 +23,18 @@ CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M, bool shuffle)
   , _combinations(0)
   , _mapping()
 {
-  init(true);
-  solve();
-  
-  _mapping = StlIntVector(_combinations, 0);
-  for (int i = 1; i < _combinations; ++i)
-  {
-    _mapping[i] = _mapping[i-1] + 1;
-  }
-  
-  if (shuffle)
-  {
-    std::shuffle(_mapping.begin(), _mapping.end(), g_rng);
-  }
-  else
-  {
-    std::mt19937 rng(0);
-    std::shuffle(_mapping.begin(), _mapping.end(), rng);
-  }
+  initVertices();
 }
   
-CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M,
-                                       bool shuffle,
-                                       std::istream& inFile)
-  : _M(M)
-  , _G()
-  , _nodeToCharStateTree(_G)
-  , _charStateTreeToNode()
-  , _combinations(0)
-  , _mapping()
+void CompatibilityGraph::init(std::ifstream& inFile)
 {
-  init(false);
-
   std::string line;
   
   int compatibilityCount = -1;
   gm::getline(inFile, line);
   std::stringstream ss(line.c_str());
   ss >> compatibilityCount;
-
+  
   for (int idx = 0; idx < compatibilityCount; ++idx)
   {
     gm::getline(inFile, line);
@@ -105,7 +78,7 @@ CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M,
       
       C.push_back(_charStateTreeToNode[c][s]);
     }
-    _maximumCliques.push_back(C);
+    _cliques.push_back(C);
   }
   
   _combinations = cliqueCount;
@@ -115,16 +88,9 @@ CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M,
   {
     _mapping[i] = _mapping[i-1] + 1;
   }
-  
-  if (shuffle)
-  {
-    std::shuffle(_mapping.begin(), _mapping.end(), g_rng);
-  }
-  else
-  {
-    std::mt19937 rng(0);
-    std::shuffle(_mapping.begin(), _mapping.end(), rng);
-  }
+//  
+//  std::mt19937 rng(0);
+//  std::shuffle(_mapping.begin(), _mapping.end(), rng);
 }
   
 void CompatibilityGraph::write(std::ostream& out) const
@@ -142,12 +108,12 @@ void CompatibilityGraph::write(std::ostream& out) const
         << dt.first << "," << dt.second << ")" << std::endl;
   }
   
-  out << _maximumCliques.front().size() << " #clique size" << std::endl;
-  out << _maximumCliques.size() << " #cliques" << std::endl;
+  out << _cliques.front().size() << " #clique size" << std::endl;
+  out << _cliques.size() << " #cliques" << std::endl;
   
   bool first = true;
   
-  for (const NodeVector& C : _maximumCliques)
+  for (const NodeVector& C : _cliques)
   {
     first = true;
     for (Node v_cs : C)
@@ -174,7 +140,7 @@ void CompatibilityGraph::init(unsigned long combination,
 {
   assert(combination < _combinations);
   
-  const int n =  _maximumCliques.front().size();
+  const int n =  _cliques.front().size();
   const int m = _M.m();
   const int k = _M.k();
   
@@ -196,7 +162,7 @@ void CompatibilityGraph::init(unsigned long combination,
     std::cerr << "Initializing combination # " << _mapping[combination] << "..." << std::endl;
   }
   
-  const NodeVector& clique = _maximumCliques[_mapping[combination]];
+  const NodeVector& clique = _cliques[_mapping[combination]];
   int cc = 0; // mapped c
   for (NodeVectorIt it = clique.begin(); it != clique.end(); ++it, ++cc)
   {
@@ -226,19 +192,94 @@ void CompatibilityGraph::init(unsigned long combination,
   }
 }
   
-void CompatibilityGraph::solve()
+void CompatibilityGraph::applyFilter(const IntPairSet& filter,
+                                     const NodeMatrix& cliques)
 {
-  std::cerr << "Searching for maximum cliques... " << std::endl;
+  // Map filter to nodes
+  NodeSet nodeFilter;
+  for (const IntPair& cs : filter)
+  {
+    nodeFilter.insert(_charStateTreeToNode[cs.first][cs.second]);
+  }
+  
+  for (const auto& C : cliques)
+  {
+    NodeSet CC(C.begin(), C.end());
+    NodeSet X;
+    std::set_intersection(nodeFilter.begin(), nodeFilter.end(), CC.begin(), CC.end(), std::inserter(X, X.begin()));
+    
+    if (X == nodeFilter)
+    {
+      _cliques.push_back(C);
+    }
+  }
+}
+  
+void CompatibilityGraph::init(const IntPairSet& filter, int size)
+{
+  initEdges();
+
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    std::cerr << "Searching for maximum cliques... " << std::endl;
+  }
+  
   BronKerbosch bk(_G);
   bk.run(BronKerbosch::BK_PIVOT_DEGENERACY);
-  
   bk.sortBySize();
   
-  _combinations = bk.getNumberOfMaximumCliques();
-  bk.getCliques(_combinations, _maximumCliques);
-  std::cerr << "Found " << _combinations << " maximum cliques of size " << bk.getMaximumCliqueSize() << std::endl;
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
+    IntSet cliqueSizes = bk.getCliqueSizes();
+    for (int s : cliqueSizes)
+    {
+      std::cerr << "Size: " << s << "; #maximal cliques: " << bk.getNrCliquesBySize(s) << std::endl;
+    }
+    std::cerr << "Total number of maximal cliques: " << bk.getNumberOfMaximalCliques() << std::endl;
+  }
+  
+  NodeMatrix cliques;
+  if (size == -1)
+  {
+    bk.getMaximumCliques(cliques);
+    
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Found " << cliques.size() << " maximum cliques of size " << bk.getMaximumCliqueSize() << std::endl;
+    }
+  }
+  else
+  {
+    bk.getCliquesBySize(size, cliques);
+    
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Found " << cliques.size() << " maximal cliques of size " << size << std::endl;
+    }
+  }
+  
+  if (filter.empty())
+  {
+    std::swap(_cliques, cliques);
+  }
+  else
+  {
+    applyFilter(filter, cliques);
+    std::cerr << "Applying filter results in " << _cliques.size() << " maximal cliques of size " << size << std::endl;
+  }
+  _combinations = _cliques.size();
+  
+  _mapping = StlIntVector(_combinations, 0);
+  for (int i = 1; i < _combinations; ++i)
+  {
+    _mapping[i] = _mapping[i-1] + 1;
+  }
+//  
+//  std::mt19937 rng(0);
+//  std::shuffle(_mapping.begin(), _mapping.end(), rng);
+  
+  
 
-  std::cerr << "Number of maximal cliques: " << bk.getNumberOfMaximalCliques() << std::endl;
 //  bool first = true;
 //  for (const NodeVector& C : bk.getMaxCliques())
 //  {
@@ -257,7 +298,7 @@ void CompatibilityGraph::solve()
 //  }
 }
   
-void CompatibilityGraph::init(bool initEdges)
+void CompatibilityGraph::initVertices()
 {
   const int n = _M.n();
 
@@ -274,33 +315,37 @@ void CompatibilityGraph::init(bool initEdges)
       _nodeToCharStateTree[v_cs] = std::make_pair(c, s);
     }
   }
+}
   
-  if (initEdges)
+void CompatibilityGraph::initEdges()
+{
+  int conflict = 0;
+  for (NodeIt v_cs(_G); v_cs != lemon::INVALID; ++v_cs)
   {
-    int conflict = 0;
-    for (NodeIt v_cs(_G); v_cs != lemon::INVALID; ++v_cs)
+    for (NodeIt v_dt(v_cs); v_dt != lemon::INVALID; ++v_dt)
     {
-      for (NodeIt v_dt(v_cs); v_dt != lemon::INVALID; ++v_dt)
+      if (v_dt == v_cs) continue;
+      
+      const IntPair& cs = _nodeToCharStateTree[v_cs];
+      const IntPair& dt = _nodeToCharStateTree[v_dt];
+      
+      if (cs.first == dt.first) continue;
+      
+      if (isCompatible(cs, dt))
       {
-        if (v_dt == v_cs) continue;
-        
-        const IntPair& cs = _nodeToCharStateTree[v_cs];
-        const IntPair& dt = _nodeToCharStateTree[v_dt];
-        
-        if (cs.first == dt.first) continue;
-        
-        if (isCompatible(cs, dt))
-        {
-          _G.addEdge(v_cs, v_dt);
-        }
-        else
-        {
-          ++conflict;
-          //std::cerr << "Conflict between (" << cs.first << "," << cs.second
-          //          << ") and (" << dt.first << "," << dt.second << ")" << std::endl;
-        }
+        _G.addEdge(v_cs, v_dt);
+      }
+      else
+      {
+        ++conflict;
+        //std::cerr << "Conflict between (" << cs.first << "," << cs.second
+        //          << ") and (" << dt.first << "," << dt.second << ")" << std::endl;
       }
     }
+  }
+  
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
+  {
     std::cerr << "Number of conflicts detected: " << conflict << std::endl;
     std::cerr << "Compatibility graph has " << lemon::countNodes(_G) << " nodes and " << lemon::countEdges(_G) << " edges" << std::endl;
   }
