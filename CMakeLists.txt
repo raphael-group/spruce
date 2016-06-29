@@ -393,7 +393,7 @@ target_link_libraries( cliques ${CommonLibs} )
 add_executable( merge ${merge_src} ${merge_hdr} )
 target_link_libraries( merge ${CommonLibs} )
 
-add_executable( ccf ${ccf_src} ${ccf_hdr} )
+add_executable( ccf EXCLUDE_FROM_ALL ${ccf_src} ${ccf_hdr} )
 target_link_libraries( ccf ${CommonLibs} )
 
 add_executable( visualize ${visualize_src} ${visualize_hdr} )

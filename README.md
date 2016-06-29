@@ -33,11 +33,13 @@ In case CMake fails to detect LEMON, run the following command with adjusted pat
 	
 The compilation results in the following files in `build` directory:
 
-* ccf
-* enumerate
-* merge
-* rank
-* visualize
+EXECUTABLE | DESCRIPTION
+-----------|-------------
+`cliques`  | Enumerates cliques of the compatibility graph (given a size and a filter)
+`enumerate`| Enumerates perfect phylogeny trees
+`merge`    | Merges multiple solution files into one
+`rank`     | Sorts solution trees by the fraction of common edges (solution with rank 0 is the most representative tree)
+`visualize`| Visualizes one solution or the entire solution space
 
-## Example usage
 
+For example usage see [`result/run_A22.sh`](../result/run_A22.sh) and corresponding [instructions](../result/README.md).
