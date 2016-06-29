@@ -6,7 +6,7 @@ sequencing data.
 
 ## Support
 
-For support using SPRUCE, please visit the [SPRUCE Google Group](https://groups.google.com/forum/#!forum/spruce).
+For support using SPRUCE, please visit the [SPRUCE Google Group](https://groups.google.com/forum/#!forum/sprucealgorithm).
 
 ## Dependencies
 
