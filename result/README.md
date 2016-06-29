@@ -6,10 +6,10 @@ In the following we describe how to obtain the results presented in the paper.
 
 We consider the following simulated instances:
 
-* [`data/sims/n_5_perfect`](data/sims/n_5_perfect)
-* [`data/sims/n_5_noisy`](data/sims/n_5_noisy)
-* [`data/sims/n_5_inf_alleles_violations`](data/sims/n_5_inf_alleles_violations)
-* [`data/sims/n_15_noisy`](data/sims/n_15_noisy)
+* [`data/sims/n_5_perfect`](../data/sims/n_5_perfect)
+* [`data/sims/n_5_noisy`](../data/sims/n_5_noisy)
+* [`data/sims/n_5_inf_alleles_violations`](../data/sims/n_5_inf_alleles_violations)
+* [`data/sims/n_15_noisy`](../data/sims/n_15_noisy)
 
 Run the following commands from the repository root directory to obtain the simulation results:
 
