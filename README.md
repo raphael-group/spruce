@@ -43,3 +43,4 @@ EXECUTABLE | DESCRIPTION
 
 
 For example usage see [`result/run_A22.sh`](result/run_A22.sh) and corresponding [instructions](result/README.md).
+For a description of the input file format see [`data/README.md`](data/README.md).
