@@ -31,7 +31,7 @@ In case CMake fails to detect LEMON, run the following command with adjusted pat
 
 	cmake -DLIBLEMON_ROOT=~/lemon ..
 	
-The compilation results in the following files in `build` directory:
+The compilation results in the following files in the `build` directory:
 
 EXECUTABLE | DESCRIPTION
 -----------|-------------
