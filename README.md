@@ -42,4 +42,4 @@ EXECUTABLE | DESCRIPTION
 `visualize`| Visualizes one solution or the entire solution space
 
 
-For example usage see [`result/run_A22.sh`](../result/run_A22.sh) and corresponding [instructions](../result/README.md).
+For example usage see [`result/run_A22.sh`](result/run_A22.sh) and corresponding [instructions](result/README.md).
