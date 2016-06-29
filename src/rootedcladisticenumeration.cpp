@@ -15,7 +15,6 @@ RootedCladisticEnumeration::RootedCladisticEnumeration(const RootedCladisticAnce
                                                        int timeLimit,
                                                        int threads,
                                                        int lowerbound,
-                                                       bool verbose,
                                                        bool monoclonal,
                                                        const IntSet& whiteList)
   : _G(G)
@@ -26,7 +25,6 @@ RootedCladisticEnumeration::RootedCladisticEnumeration(const RootedCladisticAnce
   , _threads(threads)
   , _lowerbound(lowerbound)
   , _counter(0)
-  , _verbose(verbose)
   , _mutex()
   , _sem(threads)
   , _threadGroup()
@@ -325,7 +323,7 @@ void RootedCladisticEnumeration::run()
     _threadGroup.join_all();
   }
 
-  if (_verbose)
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
     std::cerr << "\r" << std::flush;
   }
@@ -341,7 +339,7 @@ bool RootedCladisticEnumeration::finalize(SubDigraph& T)
   ++_counter;
   int currentSize = std::max(_lowerbound, _objectiveValue);
   
-  if (_verbose && g_verbosity >= VERBOSE_NON_ESSENTIAL)
+  if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
   {
     std::cerr << "\r" << _result.size() << "/" << _counter << "/" << _limit << " (" << _lowerbound << ")" << std::flush;
   }
@@ -381,7 +379,7 @@ bool RootedCladisticEnumeration::finalize(SubDigraph& T)
   else if (newSizeT > currentSize && !_result.empty())
   {
     _objectiveValue = _lowerbound = newSizeT;
-    if (_verbose && g_verbosity >= VERBOSE_ESSENTIAL)
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
     {
       std::cerr << "\r" << _result.size() << "/" << _counter << "/" << _limit << " (" << _lowerbound << ")" << std::endl;
     }

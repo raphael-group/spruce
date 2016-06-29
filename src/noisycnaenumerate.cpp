@@ -55,11 +55,11 @@ void NoisyCnaEnumerate::enumerate(int limit,
     {
       if (state_tree_limit != -1)
       {
-        std::cerr << "State tree combination " << ++count << "/" << state_tree_limit << "..." << std::endl;
+        std::cerr << std::endl << "State tree combination " << ++count << "/" << state_tree_limit << " ..." << std::endl;
       }
       else
       {
-        std::cerr << "State tree combination " << ++count << "/" << _combinations << "..." << std::endl;
+        std::cerr << std::endl << "State tree combination " << ++count << "/" << _combinations << " ..." << std::endl;
       }
     }
     solve(pi, limit, timeLimit, threads, state_tree_limit, monoclonal, whiteList);
@@ -275,7 +275,6 @@ void NoisyCnaEnumerate::solve(const StlIntVector& pi,
                                             timeLimit,
                                             threads,
                                             _treeSize,
-                                            true,
                                             monoclonal,
                                             remappedWhiteList);
   enumerate.run();
@@ -292,7 +291,12 @@ void NoisyCnaEnumerate::solve(const StlIntVector& pi,
   
   if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
-    std::cerr << std::endl << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize << std::endl;
+    if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
+    {
+      std::cerr << std::endl;
+    }
+    std::cerr << "Tree size: " << enumerate.objectiveValue() << "/" << _treeSize
+              << " (" << enumerate.solutionCount() << " trees)" << std::endl;
   }
 }
   

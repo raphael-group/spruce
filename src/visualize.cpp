@@ -82,7 +82,7 @@ int main(int argc, char** argv)
   bool ascii = false;
   int solIdx = -1;
   bool usageMatrix = false;
-  bool simple = false;
+  bool detailed = false;
   std::string labelToColorFilename;
   
   lemon::ArgParser ap(argc, argv);
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
     .refOption("u", "Print usage matrix", usageMatrix)
     .refOption("i", "Solution index (default: -1)", solIdx)
     .refOption("s", "Summarize", summarize)
-    .refOption("simple", "Simple visualization", simple)
+    .refOption("d", "Detailed visualization", detailed)
     .refOption("j", "Output JSON", json)
     .refOption("a", "ASCII", ascii)
     .other("solution", "Solution input file")
@@ -187,7 +187,7 @@ int main(int argc, char** argv)
       }
       else if (!ascii)
       {
-        if (simple)
+        if (!detailed)
         {
           T.writeDOT(sol.inferredF(), sol.U(), label2color, std::cout);
         }

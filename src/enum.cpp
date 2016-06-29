@@ -134,7 +134,7 @@ void enumerate(int limit,
   {
     if (g_verbosity >= VERBOSE_ESSENTIAL)
     {
-      std::cerr << "Initializing compatibility graph ..." << std::endl;
+      std::cerr << std::endl << "Initializing compatibility graph ..." << std::endl;
     }
     pComp = new CompatibilityGraph(M);
     pComp->init(IntPairSet(), -1);
@@ -177,8 +177,8 @@ int main(int argc, char** argv)
   int state_tree_limit = -1;
   int random_seed = 0;
   int lowerbound = 0;
-  bool monoclonal = false;
-  bool deterministic = false;
+  bool polyclonal = false;
+  bool perfectData = false;
   std::string purityString;
   std::string cliqueFile;
   int offset = 0;
@@ -188,18 +188,18 @@ int main(int argc, char** argv)
   lemon::ArgParser ap(argc, argv);
   ap.boolOption("-version", "Show version number")
     .refOption("v", "Verbosity level (default: 1)", verbosityLevel)
-    .boolOption("p", "Perfect data")
-    .boolOption("c", "Cladistic characters")
-    .refOption("m", "Monoclonal", monoclonal)
+    .boolOption("cladistic", "Cladistic character mode")
+    .refOption("p", "Polyclonal", polyclonal)
     .refOption("purity", "Purity values (used for fixing trunk)",  purityString)
     .refOption("clique", "Clique file", cliqueFile)
+    .refOption("perfect", "Perfect data mode", perfectData)
     .refOption("t", "Number of threads (default: 2)", threads)
     .refOption("l", "Maximum number of trees to enumerate (default: -1)", limit)
     .refOption("ll", "Time limit in seconds (default: -1)", timeLimit)
-    .refOption("s", "State tree combination limit (default: -1)", state_tree_limit)
-    .refOption("o", "State tree combination offset (default: 0)", offset)
-    .refOption("r", "Seed", random_seed)
-    .refOption("lb", "Lower bound on #characters in enumerated tree (default: 0)", lowerbound)
+    .refOption("s", "Number of cliques to consider (default: -1)", state_tree_limit)
+    .refOption("o", "Clique offset (default: 0)", offset)
+    .refOption("r", "Seed for random number generator", random_seed)
+    .refOption("lb", "Lower bound on #characters in enumerated trees (default: 0)", lowerbound)
     .refOption("w", "Characters that must be present in the solution trees", whiteListString)
     .other("input_1", "Input file")
     .other("input_2", "Interval file relating SNVs affected by the same CNA");
@@ -255,7 +255,7 @@ int main(int argc, char** argv)
             state_tree_limit, inFile,
             (ap.files().size() > 1 ? ap.files()[1] : ""),
             lowerbound,
-            monoclonal,
+            !polyclonal,
             purityString,
             writeCliqueFile,
             readCliqueFile,

@@ -33,7 +33,6 @@ public:
                              int timeLimit,
                              int threads,
                              int lowerbound,
-                             bool verbose,
                              bool monoclonal,
                              const IntSet& whitelist);
   
@@ -320,7 +319,6 @@ protected:
   int _threads;
   int _lowerbound;
   int _counter;
-  bool _verbose;
   
   mutable boost::mutex _mutex;
   boost::interprocess::interprocess_semaphore _sem;

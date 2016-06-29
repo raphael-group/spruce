@@ -159,7 +159,7 @@ void CompatibilityGraph::init(unsigned long combination,
   
   if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
-    std::cerr << "Initializing combination # " << _mapping[combination] << "..." << std::endl;
+    std::cerr << "Initializing state tree combination # " << _mapping[combination] << " ..." << std::endl;
   }
   
   const NodeVector& clique = _cliques[_mapping[combination]];
@@ -221,7 +221,7 @@ void CompatibilityGraph::init(const IntPairSet& filter, int size)
 
   if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
-    std::cerr << "Searching for maximum cliques... " << std::endl;
+    std::cerr << "Searching for maximum cliques ... " << std::endl;
   }
   
   BronKerbosch bk(_G);
@@ -265,7 +265,11 @@ void CompatibilityGraph::init(const IntPairSet& filter, int size)
   else
   {
     applyFilter(filter, cliques);
-    std::cerr << "Applying filter results in " << _cliques.size() << " maximal cliques of size " << size << std::endl;
+    if (g_verbosity >= VERBOSE_ESSENTIAL)
+    {
+      std::cerr << "Applying filter results in "
+                << _cliques.size() << " maximal cliques of size " << size << std::endl;
+    }
   }
   _combinations = _cliques.size();
   
@@ -426,7 +430,7 @@ bool CompatibilityGraph::isCompatible(const IntPair& cs, const IntPair& dt) cons
 //  G.setLabels(F_lb);
 //  G.writeDOT(std::cout);
   
-  RootedCladisticNoisyEnumeration enumerate(G, -1, -1, 1, 2, false, false, IntSet());
+  RootedCladisticNoisyEnumeration enumerate(G, -1, -1, 1, 2, false, IntSet());
   enumerate.run();
   
   if (enumerate.objectiveValue() == 2)

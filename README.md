@@ -38,3 +38,6 @@ The compilation results in the following files in `build` directory:
 * merge
 * rank
 * visualize
+
+## Example usage
+

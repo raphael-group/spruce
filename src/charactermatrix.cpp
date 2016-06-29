@@ -453,6 +453,10 @@ void CharacterMatrix::init()
   }
   
   // compute feasible state trees
+  if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
+  {
+    std::cerr << std::endl << "Enumerating compatible state trees for each character ..." << std::endl;
+  }
   for (int p = 0; p < _m; ++p)
   {
     for (int c = 0; c < _n; ++c)
@@ -460,7 +464,7 @@ void CharacterMatrix::init()
       if (g_verbosity >= VERBOSE_NON_ESSENTIAL)
       {
         std::cerr << "Generating compatible state trees for character " << _M[p][c].characterLabel() << " (" << c
-                  << ") in sample " << _M[p][c].sampleLabel() << " (" << p << ")..." << std::flush;
+                  << ") in sample " << _M[p][c].sampleLabel() << " (" << p << ") ..." << std::flush;
       }
 
       _M[p][c].solve(_maxX[c], _maxXY, includeMutationEdge[c], _F[p][c]);

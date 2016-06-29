@@ -21,7 +21,6 @@ public:
                                   int timeLimit,
                                   int threads,
                                   int lowerbound,
-                                  bool verbose,
                                   bool monoclonal,
                                   const IntSet& whiteList);
   

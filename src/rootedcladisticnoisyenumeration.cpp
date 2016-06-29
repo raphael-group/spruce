@@ -14,10 +14,9 @@ RootedCladisticNoisyEnumeration::RootedCladisticNoisyEnumeration(const RootedCla
                                                                  int timeLimit,
                                                                  int threads,
                                                                  int lowerbound,
-                                                                 bool verbose,
                                                                  bool monoclonal,
                                                                  const IntSet& whiteList)
-  : RootedCladisticEnumeration(G, limit, timeLimit, threads, lowerbound, verbose, monoclonal, whiteList)
+  : RootedCladisticEnumeration(G, limit, timeLimit, threads, lowerbound, monoclonal, whiteList)
   , _noisyG(G)
 {
 }
@@ -317,7 +316,7 @@ void RootedCladisticNoisyEnumeration::run()
     _threadGroup.join_all();
   }
   
-  if (_verbose)
+  if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
     std::cerr << "\r" << std::flush;
   }
