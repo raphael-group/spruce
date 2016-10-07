@@ -1,4 +1,5 @@
 #!/bin/bash
+#MEK, 06/28/2016
 build_dir="../../build/"
 
 if [ ! -d "A22" ]

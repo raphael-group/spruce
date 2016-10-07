@@ -199,6 +199,16 @@ std::istream& operator>>(std::istream& in, Character& c)
   c._vaf = boost::lexical_cast<double>(s[5]);
   c._vafUB = boost::lexical_cast<double>(s[6]);
   
+  if (std::isnan(c._vafLB))
+  {
+    throw std::runtime_error("Error: vafLB should not be 'nan'");
+  }
+  
+  if (std::isnan(c._vafUB))
+  {
+    throw std::runtime_error("Error: vafUB should not be 'nan'");
+  }
+  
   c._L.clear();
   
   int offset = 7;
