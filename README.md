@@ -4,6 +4,8 @@ Enumeration) is an algorithm for inferring the clonal evolution of
 single-nucleotide and copy-number variants given multi-sample bulk tumor
 sequencing data.
 
+[License](LICENSE.txt)
+
 ## Support
 
 For support using SPRUCE, please visit the [SPRUCE Google Group](https://groups.google.com/forum/#!forum/sprucealgorithm).
