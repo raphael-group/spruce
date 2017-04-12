@@ -87,6 +87,62 @@ void SolutionGraph::constructMixingGraph()
   }
 }
   
+void SolutionGraph::writeCloneTree(std::ostream& out) const
+{
+  const Digraph& T = _T.T();
+  const int m = _F.m();
+  const int n = _F.n();
+  
+  // skip adding samples to the root
+  for (ArcIt a_cidj(T); a_cidj != lemon::INVALID; ++a_cidj)
+  {
+    Node v_ci = T.source(a_cidj);
+    Node v_dj = T.target(a_cidj);
+    
+    out << _T.label(v_ci) << " " << _T.label(v_dj) << std::endl;
+    const IntPair& dj = _T.nodeToCharState(v_dj);
+    for (int p = 0; p < m; ++p)
+    {
+      assert(!(dj.first == 0 && dj.second == 0));
+      int row_idx = n * (dj.second - 1) + dj.first + 1;
+      double u_pdj = _sol.U()(p, row_idx);
+      if (g_tol.nonZero(u_pdj))
+      {
+        std::string sample_dj = _T.label(v_dj) + "_" + _F.getRowLabel(p);
+        // add edge
+        out << _T.label(v_dj) << " " << sample_dj << std::endl;
+      }
+    }
+  }
+}
+  
+void SolutionGraph::writeLeafLabeling(std::ostream& out) const
+{
+  const Digraph& T = _T.T();
+  const int m = _F.m();
+  const int n = _F.n();
+  
+  // skip adding samples to the root
+  for (ArcIt a_cidj(T); a_cidj != lemon::INVALID; ++a_cidj)
+  {
+    Node v_dj = T.target(a_cidj);
+    
+    const IntPair& dj = _T.nodeToCharState(v_dj);
+    for (int p = 0; p < m; ++p)
+    {
+      assert(!(dj.first == 0 && dj.second == 0));
+      int row_idx = n * (dj.second - 1) + dj.first + 1;
+      double u_pdj = _sol.U()(p, row_idx);
+      if (g_tol.nonZero(u_pdj))
+      {
+        std::string sample_dj = _T.label(v_dj) + "_" + _F.getRowLabel(p);
+        // add edge
+        out << sample_dj << " " << _F.getRowLabel(p) << std::endl;
+      }
+    }
+  }
+}
+  
 void SolutionGraph::writeASCII(std::ostream& out) const
 {
   const Digraph& T = _T.T();

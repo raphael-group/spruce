@@ -18,6 +18,7 @@ namespace gm {
 CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M)
   : _M(M)
   , _G()
+  , _cliqueLimit(-1)
   , _nodeToCharStateTree(_G)
   , _charStateTreeToNode()
   , _combinations(0)
@@ -224,7 +225,7 @@ void CompatibilityGraph::init(const IntPairSet& filter, int size)
     std::cerr << "Searching for maximum cliques ... " << std::endl;
   }
   
-  BronKerbosch bk(_G);
+  BronKerbosch bk(_G, _cliqueLimit);
   bk.run(BronKerbosch::BK_PIVOT_DEGENERACY);
   bk.sortBySize();
   

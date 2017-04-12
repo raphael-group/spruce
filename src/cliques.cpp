@@ -20,13 +20,19 @@ int main(int argc, char** argv)
 {
   int size = -1;
   std::string filterString;
+  int verbosityLevel = 1;
+  int cliqueLimit;
+  
   lemon::ArgParser ap(argc, argv);
   ap.boolOption("-version", "Show version number")
-    .synonym("v", "-version")
+    .refOption("v", "Verbosity level (default: 1)", verbosityLevel)
     .refOption("s", "Maximal clique size (default: -1 (maximum))", size)
     .refOption("f", "Filter (default : \"\")", filterString)
+    .refOption("l", "Clique limit (default : -1 (unlimited))", cliqueLimit)
     .other("input", "Input file");
   ap.parse();
+  
+  g_verbosity = static_cast<VerbosityLevel>(verbosityLevel);
   
   if (ap.given("-version"))
   {
@@ -69,6 +75,7 @@ int main(int argc, char** argv)
   M.applyHeuristic();
   
   CompatibilityGraph G(M);
+  G.setCliqueLimit(cliqueLimit);
   G.init(filter, size);
   
   G.write(std::cout);

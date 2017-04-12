@@ -252,7 +252,7 @@ void NoisyCnaEnumerate::solve(const StlIntVector& pi,
   G.init();
   
   collapse(mapNewCharToOldChar, mapOldCharToNewChar, G);
-  if (monoclonal)
+  if (monoclonal && !_purityValues.empty())
   {
     fixTrunk(F_ub, S, mapNewCharToOldChar, mapOldCharToNewChar, G);
   }

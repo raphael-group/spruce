@@ -53,7 +53,7 @@ protected:
   };
 
 public:
-  BronKerbosch(const Graph& g);
+  BronKerbosch(const Graph& g, int limit);
 
   void run(SolverType type);
 
@@ -171,6 +171,7 @@ public:
 protected:
   const Graph& _g;
   const size_t _n;
+  const int _limit;
   NodeVectorVector _cliques;
   NodeVector _bitToNode;
   BitNodeMap _nodeToBit;

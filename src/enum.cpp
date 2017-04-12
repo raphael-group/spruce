@@ -112,7 +112,7 @@ void enumerate(int limit,
   {
     return;
   }
-  if (monoclonal && purityString == "")
+  if (monoclonal && purityString != "")
   {
     std::cerr << "Expected purity values" << std::endl;
     return;

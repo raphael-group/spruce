@@ -83,6 +83,7 @@ int main(int argc, char** argv)
   int solIdx = -1;
   bool usageMatrix = false;
   bool detailed = false;
+  bool text = false;
   std::string labelToColorFilename;
   
   lemon::ArgParser ap(argc, argv);
@@ -98,6 +99,7 @@ int main(int argc, char** argv)
     .refOption("d", "Detailed visualization", detailed)
     .refOption("j", "Output JSON", json)
     .refOption("a", "ASCII", ascii)
+    .refOption("t", "Text-based labeling and tree", text)
     .other("solution", "Solution input file")
     .other("true_solution", "True solution file");
   ap.parse();
@@ -166,11 +168,25 @@ int main(int argc, char** argv)
                                showStateVectors, showCumFreqs, showEdgeLabels);
         
         char buf[1024];
-//        snprintf(buf, 1024, "%s.sol%d.dot", fs::basename(fs::path(ap.files()[0].c_str())).c_str(), idx);
-        snprintf(buf, 1024, "sol%d.dot", idx);
-        
-        std::ofstream out(buf);
-        solGraph.writeDOT(out);
+        if (!text)
+        {
+          snprintf(buf, 1024, "sol%d.dot", idx);
+          std::ofstream out(buf);
+          solGraph.writeDOT(out);
+          out.close();
+        }
+        else
+        {
+          snprintf(buf, 1024, "sol%d.tree", idx);
+          std::ofstream outT(buf);
+          solGraph.writeCloneTree(outT);
+          outT.close();
+          
+          snprintf(buf, 1024, "sol%d.labeling", idx);
+          std::ofstream outLabeling(buf);
+          solGraph.writeLeafLabeling(outLabeling);
+          outLabeling.close();
+        }
       }
     }
     else
@@ -187,7 +203,12 @@ int main(int argc, char** argv)
       }
       else if (!ascii)
       {
-        if (!detailed)
+        if (text)
+        {
+          solGraph.writeCloneTree(std::cout);
+          solGraph.writeLeafLabeling(std::cerr);
+        }
+        else if (!detailed)
         {
           T.writeDOT(sol.inferredF(), sol.U(), label2color, std::cout);
         }

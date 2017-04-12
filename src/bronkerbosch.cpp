@@ -9,9 +9,11 @@
 
 namespace gm {
 
-BronKerbosch::BronKerbosch(const Graph& g)
+BronKerbosch::BronKerbosch(const Graph& g,
+                           int limit = -1)
   : _g(g)
   , _n(static_cast<size_t>(lemon::countNodes(_g)))
+  , _limit(limit)
   , _cliques()
   , _bitToNode()
   , _nodeToBit(g, std::numeric_limits<size_t>::max())
@@ -214,6 +216,12 @@ void BronKerbosch::bkPivot(BitSet P, BitSet R, BitSet X)
   //std::cout << ", X = ";
   //print(X, std::cout);
   //std::cout << std::endl;
+  
+  if (_limit != -1 && _cliques.size() > _limit)
+  {
+    // stop enumerating when limit is reached
+    return;
+  }
 
   // Reports maximal cliques in P \cup R (but not in X)
   BitSet P_cup_X = P | X;

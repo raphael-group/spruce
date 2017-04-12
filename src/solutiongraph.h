@@ -50,6 +50,10 @@ public:
   
   void writeASCII(std::ostream& out) const;
   
+  void writeCloneTree(std::ostream& out) const;
+  
+  void writeLeafLabeling(std::ostream& out) const;
+  
   const MixingGraph& getMixingGraph() const
   {
     return _G;

@@ -35,6 +35,16 @@ public:
     return _combinations;
   }
   
+  int getCliqueLimit() const
+  {
+    return _cliqueLimit;
+  }
+  
+  void setCliqueLimit(int limit)
+  {
+    _cliqueLimit = limit;
+  }
+  
   void init(unsigned long combination,
             RealTensor& F,
             StateTreeVector& S,
@@ -66,6 +76,7 @@ protected:
 private:
   const CharacterMatrix& _M;
   Graph _G;
+  int _cliqueLimit;
   IntPairNodeMap _nodeToCharStateTree;
   NodeMatrix _charStateTreeToNode;
   
