@@ -431,7 +431,7 @@ bool CompatibilityGraph::isCompatible(const IntPair& cs, const IntPair& dt) cons
 //  G.setLabels(F_lb);
 //  G.writeDOT(std::cout);
   
-  RootedCladisticNoisyEnumeration enumerate(G, -1, -1, 1, 2, false, IntSet());
+  RootedCladisticNoisyEnumeration enumerate(G, -1, -1, 1, 2, false, false, IntSet());
   enumerate.run();
   
   if (enumerate.objectiveValue() == 2)

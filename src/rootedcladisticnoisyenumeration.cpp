@@ -15,8 +15,10 @@ RootedCladisticNoisyEnumeration::RootedCladisticNoisyEnumeration(const RootedCla
                                                                  int threads,
                                                                  int lowerbound,
                                                                  bool monoclonal,
+                                                                 bool fixTrunk,
                                                                  const IntSet& whiteList)
-  : RootedCladisticEnumeration(G, limit, timeLimit, threads, lowerbound, monoclonal, whiteList)
+  : RootedCladisticEnumeration(G, limit, timeLimit, threads,
+                               lowerbound, monoclonal, fixTrunk, whiteList)
   , _noisyG(G)
 {
 }
@@ -303,13 +305,21 @@ void RootedCladisticNoisyEnumeration::run()
     
     _threadGroup.join_all();
   }
-  else
+  else if (_fixTrunk)
   {
     // find monoclonal root
-    // TODO enable this when the trunk is fixed!
-//    OutArcIt a_00ci(G, root);
-//    Node v_ci = G.target(a_00ci);
+    OutArcIt a_00ci(G, root);
+    Node v_ci = G.target(a_00ci);
     
+    for (OutArcIt a_cidj(G, v_ci); a_cidj != lemon::INVALID; ++a_cidj)
+    {
+      _threadGroup.create_thread(boost::bind(&RootedCladisticNoisyEnumeration::runArc, this, a_cidj));
+    }
+    
+    _threadGroup.join_all();
+  }
+  else
+  {
     for (OutArcIt a_cidj(G, root); a_cidj != lemon::INVALID; ++a_cidj)
     {
       _threadGroup.create_thread(boost::bind(&RootedCladisticNoisyEnumeration::runArc, this, a_cidj));

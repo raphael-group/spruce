@@ -176,6 +176,7 @@ void CnaEnumerate::solve(const StlIntVector& pi,
                                        threads,
                                        _treeSize,
                                        monoclonal,
+                                       false,
                                        whiteList);
   enumerate.run();
   

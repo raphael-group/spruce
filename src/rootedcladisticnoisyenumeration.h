@@ -22,6 +22,7 @@ public:
                                   int threads,
                                   int lowerbound,
                                   bool monoclonal,
+                                  bool fixTrunk,
                                   const IntSet& whiteList);
   
   const RootedCladisticNoisyAncestryGraph& noisyG() const

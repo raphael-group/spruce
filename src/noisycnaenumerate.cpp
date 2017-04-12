@@ -276,6 +276,7 @@ void NoisyCnaEnumerate::solve(const StlIntVector& pi,
                                             threads,
                                             _treeSize,
                                             monoclonal,
+                                            monoclonal && !_purityValues.empty(),
                                             remappedWhiteList);
   enumerate.run();
   

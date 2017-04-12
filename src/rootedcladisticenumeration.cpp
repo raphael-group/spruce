@@ -16,6 +16,7 @@ RootedCladisticEnumeration::RootedCladisticEnumeration(const RootedCladisticAnce
                                                        int threads,
                                                        int lowerbound,
                                                        bool monoclonal,
+                                                       bool fixTrunk,
                                                        const IntSet& whiteList)
   : _G(G)
   , _result()
@@ -30,6 +31,7 @@ RootedCladisticEnumeration::RootedCladisticEnumeration(const RootedCladisticAnce
   , _threadGroup()
   , _timer()
   , _monoclonal(monoclonal)
+  , _fixTrunk(fixTrunk)
   , _whiteList(whiteList)
 {
 }

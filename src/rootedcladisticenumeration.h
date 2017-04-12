@@ -34,6 +34,7 @@ public:
                              int threads,
                              int lowerbound,
                              bool monoclonal,
+                             bool fixTrunk,
                              const IntSet& whitelist);
   
   virtual ~RootedCladisticEnumeration();
@@ -326,6 +327,7 @@ protected:
   
   lemon::Timer _timer;
   bool _monoclonal;
+  bool _fixTrunk;
   
   const IntSet& _whiteList;
 };
