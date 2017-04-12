@@ -112,11 +112,11 @@ void enumerate(int limit,
   {
     return;
   }
-  if (monoclonal && purityString != "")
-  {
-    std::cerr << "Expected purity values" << std::endl;
-    return;
-  }
+//  if (monoclonal && purityString == "")
+//  {
+//    std::cerr << "Expected purity values" << std::endl;
+//    return;
+//  }
   
   if (g_verbosity >= VERBOSE_ESSENTIAL)
   {
