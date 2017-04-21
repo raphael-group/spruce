@@ -21,7 +21,7 @@ int main(int argc, char** argv)
   int size = -1;
   std::string filterString;
   int verbosityLevel = 1;
-  int cliqueLimit;
+  int cliqueLimit = -1;
   
   lemon::ArgParser ap(argc, argv);
   ap.boolOption("-version", "Show version number")

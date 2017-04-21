@@ -343,8 +343,11 @@ void CompatibilityGraph::initEdges()
       else
       {
         ++conflict;
-        //std::cerr << "Conflict between (" << cs.first << "," << cs.second
-        //          << ") and (" << dt.first << "," << dt.second << ")" << std::endl;
+        if (g_verbosity >= VERBOSE_DEBUG)
+        {
+          std::cerr << "Conflict between (" << cs.first << "," << cs.second
+                    << ") and (" << dt.first << "," << dt.second << ")" << std::endl;
+        }
       }
     }
   }

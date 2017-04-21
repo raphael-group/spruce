@@ -298,14 +298,22 @@ void RootedCladisticNoisyEnumeration::run()
 //  else
   if (!_monoclonal)
   {
-    for (OutArcIt a_00dj(G, root); a_00dj != lemon::INVALID; ++a_00dj)
-    {
-      _threadGroup.create_thread(boost::bind(&RootedCladisticNoisyEnumeration::runArc, this, a_00dj));
-    }
+    BoolNodeMap filterNodesT(G, false);
+    BoolArcMap filterArcsT(G, false);
+    SubDigraph T(G, filterNodesT, filterArcsT);
+    filterNodesT[root] = true;
     
-    _threadGroup.join_all();
+    BoolNodeMap filterNodesG(G, true);
+    BoolArcMap filterArcsG(G, true);
+    SubDigraph subG(G, filterNodesG, filterArcsG);
+    
+    ArcList H;
+    RealTensor Fhat;
+    
+    init(subG, T, H, Fhat);
+    grow(subG, T, H, Fhat);
   }
-  else if (_fixTrunk)
+  if (_monoclonal && _fixTrunk)
   {
     // find monoclonal root
     OutArcIt a_00ci(G, root);
@@ -318,11 +326,11 @@ void RootedCladisticNoisyEnumeration::run()
     
     _threadGroup.join_all();
   }
-  else
+  else if (_monoclonal)
   {
-    for (OutArcIt a_cidj(G, root); a_cidj != lemon::INVALID; ++a_cidj)
+    for (OutArcIt a_00dj(G, root); a_00dj != lemon::INVALID; ++a_00dj)
     {
-      _threadGroup.create_thread(boost::bind(&RootedCladisticNoisyEnumeration::runArc, this, a_cidj));
+      _threadGroup.create_thread(boost::bind(&RootedCladisticNoisyEnumeration::runArc, this, a_00dj));
     }
     
     _threadGroup.join_all();

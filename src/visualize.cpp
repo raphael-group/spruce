@@ -179,13 +179,13 @@ int main(int argc, char** argv)
         {
           snprintf(buf, 1024, "sol%d.tree", idx);
           std::ofstream outT(buf);
-          solGraph.writeCloneTree(outT);
+          solGraph.writeCloneTree(outT, false);
           outT.close();
           
-          snprintf(buf, 1024, "sol%d.labeling", idx);
-          std::ofstream outLabeling(buf);
-          solGraph.writeLeafLabeling(outLabeling);
-          outLabeling.close();
+//          snprintf(buf, 1024, "sol%d.labeling", idx);
+//          std::ofstream outLabeling(buf);
+//          solGraph.writeLeafLabeling(outLabeling);
+//          outLabeling.close();
         }
       }
     }
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
       {
         if (text)
         {
-          solGraph.writeCloneTree(std::cout);
+          solGraph.writeCloneTree(std::cout, true);
           solGraph.writeLeafLabeling(std::cerr);
         }
         else if (!detailed)

@@ -50,7 +50,7 @@ public:
   
   void writeASCII(std::ostream& out) const;
   
-  void writeCloneTree(std::ostream& out) const;
+  void writeCloneTree(std::ostream& out, bool samples) const;
   
   void writeLeafLabeling(std::ostream& out) const;
   
