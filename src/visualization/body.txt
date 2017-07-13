@@ -21,7 +21,7 @@ ul.thumbs li div.selected{ border:1px solid #000;}
 <body>
 <br/>
 <div class="container">
-  <div class="row"><div class="col-lg-12"><h1>AncesTreeViz</h1></div></div>
+  <div class="row"><div class="col-lg-12"><h1>SPRUCE Visualization</h1></div></div>
   <div class="row col-lg-12" id="viewport">
     <div class="panel panel-default">
       <div class="panel-heading"><h3 class="panel-title">Viewport</h3></div>
