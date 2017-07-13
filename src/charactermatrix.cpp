@@ -122,8 +122,15 @@ void CharacterMatrix::setIntervals(std::istream& in)
       IntSet S;
       for (int j = 0; j < ss.size(); ++j)
       {
-        int c = boost::lexical_cast<int>(ss[j]);
-        S.insert(c);
+        try
+        {
+          int c = boost::lexical_cast<int>(ss[j]);
+          S.insert(c);
+        }
+        catch (boost::bad_lexical_cast& e)
+        {
+          throw std::runtime_error(getLineNumber() + "Error: " + e.what());
+        }
       }
       X[p].insert(S);
     }
@@ -602,6 +609,8 @@ std::ostream& operator<<(std::ostream& out, const CharacterMatrix& M)
   
 std::istream& operator>>(std::istream& in, CharacterMatrix& M)
 {
+  g_lineNumber = 0;
+  
   std::string line;
   gm::getline(in, line);
   
@@ -613,7 +622,7 @@ std::istream& operator>>(std::istream& in, CharacterMatrix& M)
   
   if (m <= 0)
   {
-    throw std::runtime_error("Error: m should be nonnegative");
+    throw std::runtime_error(getLineNumber() + "Error: m should be nonnegative");
   }
   
   gm::getline(in, line);
@@ -623,7 +632,7 @@ std::istream& operator>>(std::istream& in, CharacterMatrix& M)
   
   if (n <= 0)
   {
-    throw std::runtime_error("Error: n should be nonnegative");
+    throw std::runtime_error(getLineNumber() + "Error: n should be nonnegative");
   }
   
   M._m = m;
@@ -648,7 +657,7 @@ std::istream& operator>>(std::istream& in, CharacterMatrix& M)
     
     if (!(0 <= p && p < m) || !(0 <= c && c < n))
     {
-      throw std::runtime_error("Invalid character ("
+      throw std::runtime_error(getLineNumber() + "Error: invalid character ("
                                + boost::lexical_cast<std::string>(p)
                                + ","
                                + boost::lexical_cast<std::string>(c)
@@ -657,7 +666,7 @@ std::istream& operator>>(std::istream& in, CharacterMatrix& M)
     
     if (present[p][c])
     {
-      throw std::runtime_error("Duplicate character ("
+      throw std::runtime_error(getLineNumber() + "Error: duplicate character ("
                                + boost::lexical_cast<std::string>(p)
                                + ","
                                + boost::lexical_cast<std::string>(c)
@@ -674,12 +683,11 @@ std::istream& operator>>(std::istream& in, CharacterMatrix& M)
     {
       if (!present[p][c])
       {
-        throw std::runtime_error("Missing character ("
+        throw std::runtime_error(getLineNumber() + "Error: missing character ("
                                  + boost::lexical_cast<std::string>(p)
                                  + ","
                                  + boost::lexical_cast<std::string>(c)
                                  + ")");
-        
       }
     }
   }

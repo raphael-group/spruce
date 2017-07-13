@@ -191,22 +191,29 @@ std::istream& operator>>(std::istream& in, Character& c)
   StringVector s;
   boost::split(s, line, boost::is_any_of("\t "));
   
-  c._sampleIndex = boost::lexical_cast<int>(s[0]);
-  c._sampleLabel = s[1];
-  c._characterIndex = boost::lexical_cast<int>(s[2]);
-  c._characterLabel = s[3];
-  c._vafLB = boost::lexical_cast<double>(s[4]);
-  c._vaf = boost::lexical_cast<double>(s[5]);
-  c._vafUB = boost::lexical_cast<double>(s[6]);
+  try
+  {
+    c._sampleIndex = boost::lexical_cast<int>(s[0]);
+    c._sampleLabel = s[1];
+    c._characterIndex = boost::lexical_cast<int>(s[2]);
+    c._characterLabel = s[3];
+    c._vafLB = boost::lexical_cast<double>(s[4]);
+    c._vaf = boost::lexical_cast<double>(s[5]);
+    c._vafUB = boost::lexical_cast<double>(s[6]);
+  }
+  catch (boost::bad_lexical_cast& e)
+  {
+    throw std::runtime_error(getLineNumber() + "Error: " + e.what());
+  }
   
   if (std::isnan(c._vafLB))
   {
-    throw std::runtime_error("Error: vafLB should not be 'nan'");
+    throw std::runtime_error(getLineNumber() + "Error: vafLB should not be 'nan'");
   }
   
   if (std::isnan(c._vafUB))
   {
-    throw std::runtime_error("Error: vafUB should not be 'nan'");
+    throw std::runtime_error(getLineNumber() + "Error: vafUB should not be 'nan'");
   }
   
   c._L.clear();

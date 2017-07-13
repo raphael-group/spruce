@@ -12,12 +12,25 @@ namespace gm {
 
 lemon::Tolerance<double> g_tol(1e-4);
   
+int g_lineNumber = 0;
+  
 std::mt19937 g_rng(0);
   
 VerbosityLevel g_verbosity = VERBOSE_ESSENTIAL;
   
+std::string getLineNumber()
+{
+  char buf[1024];
+  
+  snprintf(buf, 1024, "Line: %d. ", g_lineNumber);
+  
+  return std::string(buf);
+}
+  
 std::istream& getline(std::istream& is, std::string& t)
 {
+  ++g_lineNumber;
+  
   // copied from: http://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
   t.clear();
   

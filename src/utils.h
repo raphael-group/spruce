@@ -40,8 +40,16 @@ typedef enum
   VERBOSE_DEBUG
 } VerbosityLevel;
 
+/// Verbosity level
 extern VerbosityLevel g_verbosity;
+
+/// Line number used for error handling in file I/O
+extern int g_lineNumber;
   
+/// Return current line number
+std::string getLineNumber();
+  
+/// Random number generator
 extern std::mt19937 g_rng;
   
 typedef std::vector<bool> StlBoolVector;

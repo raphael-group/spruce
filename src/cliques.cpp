@@ -46,10 +46,11 @@ int main(int argc, char** argv)
     return 1;
   }
   
-  std::ifstream inFile(ap.files()[0].c_str());
+  const std::string& inputFilename(ap.files()[0]);
+  std::ifstream inFile(inputFilename.c_str());
   if (!inFile.good())
   {
-    std::cerr << "Unable to open '" << ap.files()[0].c_str()
+    std::cerr << "Unable to open '" << inputFilename
               << "' for reading" << std::endl;
     return 1;
   }
@@ -69,7 +70,15 @@ int main(int argc, char** argv)
   }
 
   CharacterMatrix M;
-  inFile >> M;
+  try
+  {
+    inFile >> M;
+  }
+  catch (std::runtime_error& e)
+  {
+    std::cerr << "File: '" << ap.files()[0].c_str() << "'. " << e.what() << std::endl;
+    return 1;
+  }
   
   M.init();
   M.applyHeuristic();

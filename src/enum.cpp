@@ -51,6 +51,8 @@ void read_cladistic_tensor(std::ifstream& inFile,
                            RealTensor& F,
                            StateTreeVector& S)
 {
+  g_lineNumber = 0;
+  
   inFile >> F;
   F.setLabels(inFile);
   std::string line;
@@ -60,7 +62,15 @@ void read_cladistic_tensor(std::ifstream& inFile,
   
   for (int c = 0; c < F.n(); ++c)
   {
-    inFile >> S[c];
+    try
+    {
+      inFile >> S[c];
+    }
+    catch (std::runtime_error& e)
+    {
+      std::cerr << "State tree file. " << getLineNumber() << e.what() << std::endl;
+      exit(1);
+    }
   }
 }
 
@@ -96,14 +106,31 @@ void enumerate(int limit,
                SolutionSet& sols)
 {
   CharacterMatrix M;
-  inFile >> M;
+  
+  try
+  {
+    inFile >> M;
+  }
+  catch (std::runtime_error& e)
+  {
+    std::cerr << "Character matrix file. " << e.what() << std::endl;
+    exit(1);
+  }
   
   if (!intervalFile.empty())
   {
     std::ifstream inFile2(intervalFile.c_str());
     if (inFile2.good())
     {
-      M.setIntervals(inFile2);
+      try
+      {
+        M.setIntervals(inFile2);
+      }
+      catch (std::runtime_error& e)
+      {
+        std::cerr << "Interval file. " << e.what() << std::endl;
+        exit(1);
+      }
     }
   }
   
