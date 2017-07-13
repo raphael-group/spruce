@@ -14,6 +14,8 @@
 
   This will create a directory `bower_components/`.
 
+  2017/07/13: The most recent version of d3 is incompatible with the current script. As such, please do not perform this step and use the javascript libaries present in the repository.
+
 1. Generate the HTML and JSON file by running:
 
         python generate.py ../../build/visualize solution.txt
