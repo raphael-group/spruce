@@ -1,0 +1,14 @@
+{
+  "name": "jquery-bootpag",
+  "homepage": "https://github.com/botmonster/jquery-bootpag",
+  "version": "1.0.7",
+  "_release": "1.0.7",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.7",
+    "commit": "65ef9f5013aee3f68b8157c52e383983d3958730"
+  },
+  "_source": "git://github.com/botmonster/jquery-bootpag.git",
+  "_target": "*",
+  "_originalSource": "jquery-bootpag"
+}

@@ -1,0 +1,80 @@
+<meta charset="utf-8">
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+<style>
+g.edge path{fill:none;stroke:black;opacity:1;}
+g.edge.selected path{stroke:red;opacity:1;}
+g.edge.inactive path{opacity:0.25;}
+g.edge polygon{fill:black;stroke:black;opacity:1;}
+g.edge.inactive polygon{opacity:0.25;}
+g.edge.selected polygon{fill:red;stroke:red;opacity:1;}
+dl#selected-edges dd span{ padding-left:10px;padding-right:10px;}
+ul#ancestrees{ overflow-x:scroll;white-space: nowrap;}
+ul.thumbs li div svg{ cursor:pointer;}
+ul.thumbs li div:hover{border:1px solid #000;}
+ul.thumbs li div.selected{ border:1px solid #000;}
+</style>
+<script src="bower_components/d3/d3.min.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="bower_components/jquery-bootpag/lib/jquery.bootpag.min.js"></script>
+</head>
+<body>
+<br/>
+<div class="container">
+  <div class="row"><div class="col-lg-12"><h1>AncesTreeViz</h1></div></div>
+  <div class="row col-lg-12" id="viewport">
+    <div class="panel panel-default">
+      <div class="panel-heading"><h3 class="panel-title">Viewport</h3></div>
+      <div class="panel-body">
+        <h5 id="viewport-title" style="float:left">Consensus Tree</h5>
+        <div id="viewport-body"></div><br/>
+        <div class="col-lg-12" id="viewport-legend" style="border:1px solid #000">
+          <h3>Legend</h3>
+          <dl id="selected-edges" class="dl-horizontal">
+            <dt>Selected Edges</dt>
+            <dd><span>None</span></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row col-lg-12" id="thumbnails">
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="panel panel-default">
+          <div class="panel-heading"><h5 class="panel-title">Consensus Tree</h5></div>
+          <div class="panel-body">
+            <ul class="list-inline thumbs"><li><br/><div class="thumbnail selected" id="consensus-tree"></div></li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <div class="panel panel-default">
+          <div class="panel-heading"><h5 id='ancestrees-title' class="panel-title">AncesTrees</h5></div>
+          <div class="panel-body" id="thumb-wrapper" style="overflow-x:scroll">
+            <ul class="list-inline thumbs clearfix" id="ancestrees"></ul>
+            <div id="pagination-counter"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Script for controlling the SVG -->
+<script>
+// Select the elements we will use to control the page
+var viewport            = d3.select('div#viewport-body'),
+    viewport_title      = d3.select('h5#viewport-title'),
+    thumbnails          = d3.select('div#thumbnails'),
+    consensus_thumbnail = thumbnails.select('div#consensus-tree'),
+    ancestrees          = thumbnails.select('ul#ancestrees'),
+    paginator           = $('div#thumb-wrapper'),
+    paginationCounter   = d3.select('div#pagination-counter');
+
+// Global constants
+var thumbWidth = 220.0
+    viewportWidth = $('div#viewport').width() - 20, // leave some room for padding
+    thumbsPerPage = 3;
+
+// Load the data file and run the interactive visualization
+

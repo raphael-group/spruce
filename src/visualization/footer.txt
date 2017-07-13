@@ -1,0 +1,275 @@
+    // Parse the data into shorter handles
+    var nodes = data.nodes,
+        rawSVG = data.svg,
+        solns = Object.keys(data)
+            .filter(function(d){ return d != 'nodes' && d != 'svg'; })
+            .map(function(d){ return { name: d, data: data[d] }; }),
+        nodeToLabel = {};
+
+    nodes.forEach(function(d){ nodeToLabel[d.id] = d.label; });
+
+    // Permanently updated the thumbnail title to include
+    // the number of AncesTree solutions
+    d3.select('h5#ancestrees-title').text('Trees (' + solns.length + ' solutions)')
+
+    // Initialize globals
+    var edgeID    = {},
+        edgeLabel = {},
+        edgeToSolns = {},
+        solnToEdges = {},
+
+        // These three variables will keep track of state
+        edgeToActiveSolns = {},
+        selectedEdges = d3.set(),
+        activeSolns = d3.set();
+
+    // Add the SVG so we can retrieve IDs of each edge in the SVG
+    viewport.html(rawSVG);
+    viewport.selectAll('.edge').each(function(d){
+        var el   = d3.select(this),
+            _id  = el.attr('id')
+            edge = parse_edge_title(el.select('title').text());
+        edgeID[[edge.source, edge.target]] = _id;
+        edgeToSolns[_id] = d3.set();
+        edgeToActiveSolns[_id] = d3.set();
+        edgeLabel[_id] = edge;
+    });
+
+    // Then initialize the state, where all edges and solutions are initially
+    // "active" and no edges are selected
+    activeSolns   = d3.set(solns.map(function(soln){ return soln.name; }));
+    solns.forEach(function(soln){
+        solnToEdges[soln.name] = d3.set(soln.data.map(function(d){
+            return edgeID[[d.source, d.target]];
+        }))
+        soln.data.forEach(function(d){
+            var edge_id = edgeID[[d.source, d.target]];
+            edgeToSolns[edge_id].add(soln.name);
+            edgeToActiveSolns[edge_id].add(soln.name);
+        });
+    });
+
+    // Add the thumbnail of the consensus, and initialize the consensus in
+    // the viewport
+    function set_viewport_to_consensus(){
+        // Reset the variables that keep track of state
+        edgeToActiveSolns = {};
+        Object.keys(edgeToSolns).forEach(function(k){
+            edgeToActiveSolns[k] = d3.set(edgeToSolns[k].values());
+        });
+        selectedEdges = d3.set();
+        activeSolns   = d3.set(solns.map(function(soln){ return soln.name; }));
+
+        // Update the viewport with the consensus SVG
+        viewport.html(rawSVG);
+        viewport.selectAll('.edge').on('click', toggle_edge);
+        viewport_title.text('Consensus Tree');
+
+        d3.selectAll('ul.thumbs li div').classed('selected', false);
+        consensus_thumbnail.classed('selected', true);
+        d3.selectAll('ul.thumbs li').style('display', '');
+        d3.select('dl#selected-edges dd').html('<span>None</span>');
+
+        // Resize the SVG so that it fits the container
+        resize_svg(viewport.select('svg'), viewportWidth);
+
+        // Reset the pagination
+        paginate_thumbs();
+    }
+
+    // Set up the consensus thumbnail
+    consensus_thumbnail.html(rawSVG);
+    var thumb = consensus_thumbnail.select('svg');
+    resize_svg(thumb, thumbWidth);
+    thumb.on('click', set_viewport_to_consensus);
+
+    // Initialize the viewport and the thumbnail pagination
+    set_viewport_to_consensus();
+    paginate_thumbs();
+
+    // Update the filter graph based on the selected edges
+    function toggle_edge(){
+        // Update the appearance
+        var el  = d3.select(this),
+            _id = el.attr('id');
+
+        // If the edge is inactive (no trees contain it with the selected edges),
+        // then we do nothing
+        if (edgeToActiveSolns[_id].empty()) return;
+        // Otherwise toggle the edge as inactive
+        else if(selectedEdges.has(_id)){
+            selectedEdges.remove(_id);
+
+            // Check to see if there are any solutions we need to add back
+            var solnsToActivate = solns.filter(function(soln){
+                if (activeSolns.has(soln.name)) return false;
+                else return selectedEdges.values().every(function(edge){
+                    return solnToEdges[soln.name].has(edge);
+                });
+            });
+            solnsToActivate.forEach(function(soln){
+                activeSolns.add(soln.name);
+                solnToEdges[soln.name].forEach(function(edge){
+                    edgeToActiveSolns[edge].add(soln.name);
+                });
+            });
+        }
+        else{
+            selectedEdges.add(_id);
+
+            // Check to see if there are any solutions we need to remove
+            var solnsToInactivate = activeSolns.values().filter(function(soln){
+                return !solnToEdges[soln].has(_id);
+            });
+            solnsToInactivate.forEach(function(soln){
+                activeSolns.remove(soln);
+                solnToEdges[soln].forEach(function(edge){
+                    edgeToActiveSolns[edge].remove(soln);
+                });
+            });
+        }
+
+        // Update the edges in the viewport
+        viewport.selectAll('.edge')
+            .attr('class', function(){
+                var edge_id = d3.select(this).attr('id');
+                if (selectedEdges.has(edge_id)) return 'edge selected';
+                else if(edgeToActiveSolns[edge_id].empty()) return 'edge inactive';
+                else return 'edge';
+            }).selectAll('text')
+            .text(function(){
+                var edge_id = d3.select(this.parentNode).attr('id'),
+                    edgeActiveSolns = edgeToActiveSolns[edge_id];
+                return edgeActiveSolns.empty() ? '' : edgeActiveSolns.size();
+            });
+
+        // Update the selected edges legend
+        var legendEdges = d3.select('dl#selected-edges dd');
+        legendEdges.selectAll('*').remove();
+        if (selectedEdges.empty()){
+            legendEdges.append('span').text('None');
+        } else {
+            legendEdges.selectAll('span')
+                .data(selectedEdges.values().sort()).enter()
+                .append('span')
+                .html(function(_id){
+                    var edge = edgeLabel[_id];
+                    return nodeToLabel[edge.source] + ' &#10142; ' + nodeToLabel[edge.target];
+                });
+        }
+
+        // Update the thumbnail list
+        paginate_thumbs();
+    }
+
+    // Render the thumbnails given the current page number
+    function render_thumbs_page(event, num){
+        // Update the thumbnails being shown
+        var visibleThumbnails = activeSolns.values().slice((num-1)*thumbsPerPage, num*thumbsPerPage);
+
+        // Set up the AncesTree solution thumbnails
+        ancestrees.selectAll('*').remove();
+        var thumbs = ancestrees.selectAll('.thumb')
+            .data(visibleThumbnails.map(function(d){
+                return {name: d, edges: solnToEdges[d].values().map(function(edge){ return edgeLabel[edge]; })}
+            })).enter()
+            .append('li');
+
+        thumbs.append('b').html(function(d){ return d.name; });
+
+        thumbs.append('div')
+            .attr('class', 'thumbnail active')
+            .html(rawSVG)
+            .each(function(d){
+                // Resize the SVG and filter its edges
+                var svg = d3.select(this).select('svg');
+                resize_svg(svg, thumbWidth);
+                filter_svg(svg, d.name, d.edges);
+            }).on('click', function(d){
+                // Add the SVG to the viewport, filtering edges as necessary
+                viewport.html(rawSVG)
+                filter_svg(viewport.select('svg'), d.name, d.edges);
+                resize_svg(viewport.select('svg'), viewportWidth);
+
+                // Highlight this thumbnail as selected
+                d3.selectAll('ul.thumbs li div').classed('selected', false);
+                d3.select(this).classed('selected', true);
+
+                // Add a short title and reset the legend
+                viewport_title.text(d.name);
+
+            });
+
+        // Update the pagination counter
+        paginationCounter.text('Page ' + num + '/' + Math.ceil(activeSolns.size() / thumbsPerPage) + ' (' + activeSolns.size() + ' total)')
+    }
+
+    // Reset the paginator
+    function paginate_thumbs(){
+        paginator.bootpag({
+            total: Math.ceil(activeSolns.size() / thumbsPerPage),
+            maxVisible: 10,
+            page: 1,
+            wrapClass: 'pull-left pagination'
+        }).on("page", render_thumbs_page);
+        render_thumbs_page(null, 1);
+    }
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper functions
+
+// Parse the edge information stored in the title of a Graphviz edge
+function parse_edge_title(edge_title){
+  var arr = edge_title.split('->');
+  return { source: +arr[0], target: +arr[1] };
+}
+
+// Resize the given SVG from its current size to the desired size,
+// using the viewbox
+function resize_svg(svg, desired_width){
+    // Use the current aspect ratio
+    var current_width  = +svg.attr('width').match(/\d+/g)[0],
+        current_height = +svg.attr('height').match(/\d+/g)[0],
+        desired_height = desired_width / current_width * current_height;
+
+    svg.attr('viewBox', '0 0 ' + current_width  + ' ' + current_height)
+        .attr('width', desired_width)
+        .attr('height', desired_height);
+}
+
+// Iterate through the edges of the current SVG, changing their IDs
+// and hiding them as necessary
+function filter_svg(svg, name, edges){
+    // Make a list of the nodes included in this tree
+    var nodes = {};
+    edges.forEach(function(edge){
+        nodes[edge.source] = true;
+        nodes[edge.target] = true;
+    });
+
+    // Change the ID of all nodes, and hide missing nodes
+    svg.selectAll('.node').each(function(){
+        var el   = d3.select(this),
+        node = +el.select('title').text();
+        el.attr('id', name + '-' + el.attr('id'));
+        if (!nodes[node]) el.style('display', 'none');
+    });
+
+    // Filter the edges missing in this tree, and update the IDs of the edges
+    svg.selectAll('.edge').each(function(){
+        var el = d3.select(this),
+        edge = parse_edge_title(el.select('title').text());
+
+        el.attr('id', name + '-' + el.attr('id'));
+        if (!edges.some(function(e){ return e.source == edge.source && e.target == edge.target; })){
+            el.style('display', 'none');
+        }
+    });
+
+    // Also, hide the edge labels
+    svg.selectAll('.edge').selectAll('text').style('display', 'none')
+}
+
+</script>
+</body>
