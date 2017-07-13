@@ -516,7 +516,7 @@ std::istream& operator>>(std::istream& in, SolutionSet& sols)
   
   if (solCount <= 0)
   {
-    throw std::runtime_error("Error: solCount should be nonnegative");
+    throw std::runtime_error(getLineNumber() + "Error: solCount should be nonnegative");
   }
   
   sols._sol.clear();

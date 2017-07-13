@@ -102,6 +102,7 @@ void CharacterMatrix::applyHeuristic()
   
 void CharacterMatrix::setIntervals(std::istream& in)
 {
+  g_lineNumber = 0;
   typedef std::vector<std::string> StringVector;
 
   std::string line;

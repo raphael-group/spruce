@@ -109,6 +109,7 @@ void enumerate(int limit,
   
   try
   {
+    g_lineNumber = 0;
     inFile >> M;
   }
   catch (std::runtime_error& e)

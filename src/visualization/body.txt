@@ -50,7 +50,7 @@ ul.thumbs li div.selected{ border:1px solid #000;}
       </div>
       <div class="col-lg-9">
         <div class="panel panel-default">
-          <div class="panel-heading"><h5 id='ancestrees-title' class="panel-title">AncesTrees</h5></div>
+          <div class="panel-heading"><h5 id='ancestrees-title' class="panel-title">Trees</h5></div>
           <div class="panel-body" id="thumb-wrapper" style="overflow-x:scroll">
             <ul class="list-inline thumbs clearfix" id="ancestrees"></ul>
             <div id="pagination-counter"></div>

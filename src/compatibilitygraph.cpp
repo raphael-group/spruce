@@ -29,6 +29,7 @@ CompatibilityGraph::CompatibilityGraph(const CharacterMatrix& M)
   
 void CompatibilityGraph::init(std::ifstream& inFile)
 {
+  g_lineNumber = 0;
   std::string line;
   
   int compatibilityCount = -1;
@@ -75,7 +76,11 @@ void CompatibilityGraph::init(std::ifstream& inFile)
     for (const std::string& str : s)
     {
       int c = -1, s = -1;
-      sscanf(str.c_str(), "(%d,%d)", &c, &s);
+      if (sscanf(str.c_str(), "(%d,%d)", &c, &s) != 2)
+      {
+        throw std::runtime_error(getLineNumber() + "Error: '" + str
+                                 + "' is not a pair of a character index and a state tree index");
+      }
       
       C.push_back(_charStateTreeToNode[c][s]);
     }

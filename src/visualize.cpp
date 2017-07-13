@@ -65,8 +65,17 @@ bool read_solutions(const std::string& filename,
       return false;
     }
     
-    inFile >> sols;
-    inFile.close();
+    try
+    {
+      g_lineNumber = 0;
+      inFile >> sols;
+      inFile.close();
+    }
+    catch (std::runtime_error& e)
+    {
+      std::cerr << "Solution file: '" << filename << "'. " << e.what() << std::endl;
+      return false;
+    }
   }
   
   return true;
