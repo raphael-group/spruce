@@ -1,6 +1,6 @@
 10 #m
 82 #n
-#sample_index	sample_label	character_label	character_index	vaf_lb	vaf_mean	vaf_ub	x	y	mu	x	y	mu	x	y	mu	x	y	mu	x	y	mu	x	y	mu
+#sample_index	sample_label	character_index	character_label	vaf_lb	vaf_mean	vaf_ub	x	y	mu	x	y	mu	x	y	mu	x	y	mu	x	y	mu	x	y	mu
 0	A22-A	0	ENSG00000214793	0	0	0	1	1	1	2	1	0
 1	A22-C	0	ENSG00000214793	0	0	0	1	1	1	2	1	0
 2	A22-D	0	ENSG00000214793	0.139700581	0.190730838	0.250219406	1	1	0.718981296	2	1	0.281018704
