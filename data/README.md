@@ -22,6 +22,7 @@ Requirements:
 * `mu` values (the proportion of cells with copy-number state `(x,y)`) are non-negative and sum up to 1 (for each row)
 
 See [`real/A22.tsv`](real/A22.tsv) for an example.
+Please see [`convert.py`](convert.py) for a Python script for obtaining confidence intervals from read count data.
 
 ## Interval file format
 

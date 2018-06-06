@@ -74,6 +74,7 @@ void Character::solve(int xy_max_c,
   for (StateGraph::StateEdgeSetSetIt it = setS.begin(); it != setS.end(); ++it)
   {
     const StateGraph::StateEdgeSet& S = *it;
+    if (S.empty()) continue;
     
     StlRealIntervalTensor f(xy_max_overall + 1,
                             StlRealIntervalMatrix(xy_max_overall + 1,
